@@ -9,7 +9,8 @@
 		.number-input{display: inline-block;}
 		.number-input span{display: inline-block;width: 28px;height: 28px;line-height:28px;background-color: #e5e5e5;color: #b2b2b2;vertical-align: top;float: left;font-size: 20px;overflow: hidden;text-align: center;-webkit-user-select:none;}
 		.number-input span.add{float: right;}
-		.number-input input{border: 1px solid #e5e5e5;padding: 5px;line-height: 16px;vertical-align:top;width: 50px;text-align: center;-webkit-appearance: none;}
+		.number-input input{border: 1px solid #e5e5e5;padding: 5px;line-height: 16px;vertical-align:top;width: 50px;text-align: center;}
+		input::-webkit-outer-spin-button,input::-webkit-inner-spin-button, input::-moz-outer-spin-button,input::-moz-inner-spin-button{-webkit-appearance: none !important;-moz-appearance:none !important;appearance:none !important;}
 	</style>
 </head>
 <body>
@@ -55,7 +56,7 @@
 						callback: options.callback
 					};
 				
-				function get(current) {
+				function get() {
 					var next = defaults.init;
 					return {
 						add: function() {
@@ -65,8 +66,12 @@
 							next = next > defaults.min ? next - 1 : next;
 						},
 						input: function() {
-							console.log(0);
-							next = parseInt(current) || next;
+							next = parseInt(inputDom.value) || next;
+							if(next < defaults.min) {
+								next = defaults.min;
+							}else if (next > defaults.max) {
+								next = defaults.max;
+							}
 						},
 						getResult: function() {
 							return next;
@@ -102,9 +107,9 @@
 					done(result);
 				};
 
-				inputDom.keyup = function(event) {
+				inputDom.onkeyup = function(event) {
 					var result = parseInt(this.value) || 1;
-					getNumber.input(result);
+					getNumber.input();
 					result = getNumber.getResult();
 					inputDom.value = result;
 					done(result);
@@ -118,7 +123,7 @@
 		window.numberInput(document.getElementsByClassName('number-input')[0], {callback: function(result) {
 			alert("结果是：" + result);
 		}});
-		
+
 		window.numberInput(document.getElementsByClassName('number-input')[1], {init: 10, min: 1, max: 20});
 
 	</script>
