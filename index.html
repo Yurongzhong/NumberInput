@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>数量选择</title>
+	<style type="text/css">
+		.number-input{display: inline-block;}
+		.number-input span{display: inline-block;width: 28px;height: 28px;line-height:28px;background-color: #e5e5e5;color: #b2b2b2;vertical-align: top;float: left;font-size: 20px;overflow: hidden;text-align: center;-webkit-user-select:none;}
+		.number-input span.add{float: right;}
+		.number-input input{border: 1px solid #e5e5e5;padding: 5px;line-height: 16px;vertical-align:top;width: 50px;text-align: center;-webkit-appearance: none;}
+	</style>
+</head>
+<body>
+	<div class="number-input">
+		<span class="cut">-</span>
+		<input type="number" value="0">
+		<span class="add">+</span>
+	</div>
+
+	<div class="number-input">
+		<span class="cut">-</span>
+		<input type="tel" value="0">
+		<span class="add">+</span>
+	</div>
+
+	<script type="text/javascript">
+
+		(function (window) {
+			'use strict';
+
+
+			function isFunction(test){
+			    return typeof test == 'function';
+			}
+
+			/**
+			 * 数字输入框
+			 * @param  {element} el           输入框外层div
+			 * @param  {number} init          输入框初始值
+			 * @param  {number} min           输入框最小值
+			 * @param  {number} max           输入框最大值
+			 * @param  {function} callback    回调函数，改变输入框的值后调用
+			 */
+			function numberInput(el, options) {
+				if(!el) {
+					return;
+				}
+				
+				var defaults = {
+						init: options.init || 1,
+						min: options.min || 1,
+						max: options.max || 99999,
+						callback: options.callback
+					};
+				
+				function get(current) {
+					var next = defaults.init;
+					return {
+						add: function() {
+							next = next < defaults.max ? next + 1 : next;
+						},
+						cut: function() {
+							next = next > defaults.min ? next - 1 : next;
+						},
+						input: function() {
+							console.log(0);
+							next = parseInt(current) || next;
+						},
+						getResult: function() {
+							return next;
+						}
+					}
+				}
+
+				function done(result) {
+					if(isFunction(defaults.callback)) {
+						defaults.callback.call(this, result);
+					}
+				}
+
+				var cutDom = el.getElementsByTagName('span')[0],
+					addDom = el.getElementsByTagName('span')[1],
+					inputDom = el.getElementsByTagName('input')[0];
+
+				var getNumber = get();
+
+				inputDom.value = defaults.init;
+
+				cutDom.onclick = function(event) {
+					getNumber.cut();
+					var result = getNumber.getResult();
+					inputDom.value = result;
+					done(result);
+				};
+
+				addDom.onclick = function(event) {
+					getNumber.add();
+					var result = getNumber.getResult();
+					inputDom.value = result;
+					done(result);
+				};
+
+				inputDom.keyup = function(event) {
+					var result = parseInt(this.value) || 1;
+					getNumber.input(result);
+					result = getNumber.getResult();
+					inputDom.value = result;
+					done(result);
+				};
+			}
+
+			window.numberInput = window.numberInput || numberInput;
+		})(window);
+
+
+		window.numberInput(document.getElementsByClassName('number-input')[0], {callback: function(result) {
+			alert("结果是：" + result);
+		}});
+		
+		window.numberInput(document.getElementsByClassName('number-input')[1], {init: 10, min: 1, max: 20});
+
+	</script>
+</body>
+</html>
